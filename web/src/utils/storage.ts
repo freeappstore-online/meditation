@@ -33,8 +33,11 @@ export interface Stats {
   longestStreak: number;
 }
 
+/** Local calendar date as YYYY-MM-DD */
 function toDateStr(d: Date): string {
-  return d.toISOString().slice(0, 10);
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${d.getFullYear()}-${m}-${day}`;
 }
 
 export function computeStats(sessions: Session[]): Stats {
@@ -44,7 +47,7 @@ export function computeStats(sessions: Session[]): Stats {
   );
 
   // Unique dates with sessions
-  const datesSet = new Set(sessions.map((s) => s.date.slice(0, 10)));
+  const datesSet = new Set(sessions.map((s) => toDateStr(new Date(s.date))));
   const dates = [...datesSet].sort();
 
   let currentStreak = 0;
@@ -119,7 +122,7 @@ export function sessionsByDate(
 ): Record<string, number> {
   const map: Record<string, number> = {};
   for (const s of sessions) {
-    const key = s.date.slice(0, 10);
+    const key = toDateStr(new Date(s.date));
     map[key] = (map[key] ?? 0) + 1;
   }
   return map;
